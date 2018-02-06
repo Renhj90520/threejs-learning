@@ -27,10 +27,10 @@ function init() {
   var directionalLight = getDirectionalLight(1);
   directionalLight.position.y = 4;
   directionalLight.position.intensity = 2;
-  gui.add(directionalLight.position, "x", 0, 20);
-  gui.add(directionalLight.position, "y", 0, 20);
-  gui.add(directionalLight.position, "z", 0, 20);
-  gui.add(directionalLight, "intensity", 0, 10);
+  // gui.add(directionalLight.position, "x", 0, 20);
+  // gui.add(directionalLight.position, "y", 0, 20);
+  // gui.add(directionalLight.position, "z", 0, 20);
+  // gui.add(directionalLight, "intensity", 0, 10);
   var helper = new THREE.CameraHelper(directionalLight.shadow.camera);
 
   // var ambientLight = getAmbientLight(10);
@@ -57,11 +57,66 @@ function init() {
     1,
     1000
   );
+
+  var cameraZPosition = new THREE.Group();
+  var cameraYPosition = new THREE.Group();
+  var cameraYRotation = new THREE.Group();
+  var cameraXRotation = new THREE.Group();
+  var cameraZRotation = new THREE.Group();
+
+  cameraXRotation.name = "cameraXRotation";
+  cameraYRotation.name = "cameraYRotation";
+  cameraZPosition.name = "cameraZPosition";
+  cameraYPosition.name = "cameraYPosition";
+  cameraZRotation.name = "cameraZRotation";
+
+  cameraZPosition.add(camera);
+  cameraYRotation.add(cameraZPosition);
+  cameraXRotation.add(cameraYRotation);
+  cameraYPosition.add(cameraXRotation);
+  cameraZRotation.add(cameraYPosition);
+  scene.add(cameraZRotation);
+
+  cameraXRotation.rotation.x = -Math.PI / 2;
+  cameraZPosition.position.z = 100;
+  cameraYPosition.position.y = 1;
+  var zPStartV = { val: 100 };
+  new TWEEN.Tween(zPStartV)
+    .to({ val: -50 }, 12000)
+    .onUpdate(function() {
+      cameraZPosition.position.z = zPStartV.val;
+    })
+    .start();
+  var xRStartV = { val: -Math.PI / 2 };
+  new TWEEN.Tween(xRStartV)
+    .to({ val: 0 }, 6000)
+    .delay(1000)
+    .easing(TWEEN.Easing.Quadratic.InOut)
+    .onUpdate(function() {
+      cameraXRotation.rotation.x = xRStartV.val;
+    })
+    .start();
+  var yRStartV = { val: 0 };
+  new TWEEN.Tween(yRStartV)
+    .to({ val: Math.PI / 2 }, 6000)
+    .delay(1000)
+    .easing(TWEEN.Easing.Quadratic.InOut)
+    .onUpdate(function() {
+      cameraYRotation.rotation.y = yRStartV.val;
+    })
+    .start();
+
+  gui.add(cameraZPosition.position, "z", 0, 100);
+  gui.add(cameraYRotation.rotation, "y", -Math.PI, Math.PI);
+  gui.add(cameraXRotation.rotation, "x", -Math.PI, Math.PI);
+  gui.add(cameraZRotation.rotation, "z", -Math.PI, Math.PI);
+
   // var camera = new THREE.OrthographicCamera(-15, 15, 15, -15, 1, 1000);
-  camera.position.x = 1;
-  camera.position.y = 2;
-  camera.position.z = 5;
-  camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+  // camera.position.x = 1;
+  // camera.position.y = 2;
+  // camera.position.z = 5;
+  // camera.lookAt(new THREE.Vector3(0, 0, 0));
 
   var renderer = new THREE.WebGLRenderer();
   renderer.shadowMap.enabled = true;
@@ -70,9 +125,10 @@ function init() {
 
   document.body.appendChild(renderer.domElement);
 
-  var controls = new THREE.OrbitControls(camera, renderer.domElement);
+  // var controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-  update(renderer, scene, camera, controls, clock);
+  // update(renderer, scene, camera, controls, clock);
+  update(renderer, scene, camera, clock);
 
   return scene;
 }
@@ -166,19 +222,32 @@ function getAmbientLight(intensity) {
 }
 var scene = init();
 
-function update(renderer, scene, camera, controls, clock) {
+//controls,
+function update(renderer, scene, camera, clock) {
   renderer.render(scene, camera);
-  controls.update();
-
+  // controls.update();
+  TWEEN.update();
   var timeElapsed = clock.getElapsedTime();
 
+  // var cameraZPosition = scene.getObjectByName("cameraZPosition");
+  // cameraZPosition.position.z -= 0.25;
+
+  var cameraZRotation = scene.getObjectByName("cameraZRotation");
+  cameraZRotation.rotation.z =
+    noise.simplex2(timeElapsed * 1.5, timeElapsed * 1.5) * 0.02;
+
+  // var cameraXRotation = scene.getObjectByName("cameraXRotation");
+  // if (cameraXRotation.rotation.x < 0) {
+  //   cameraXRotation.rotation.x += 0.01;
+  // }
   var boxGrid = scene.getObjectByName("boxGrid");
   boxGrid.children.forEach(function(child, index) {
-    var x = timeElapsed * 5 + index;
+    var x = timeElapsed + index;
     child.scale.y = (noise.simplex2(x, x) + 1) / 2 + 0.001;
     child.position.y = child.scale.y / 2;
   });
   requestAnimationFrame(function() {
-    update(renderer, scene, camera, controls, clock);
+    // update(renderer, scene, camera, controls, clock);
+    update(renderer, scene, camera, clock);
   });
 }
