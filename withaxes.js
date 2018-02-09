@@ -34,7 +34,8 @@ function init() {
   addPlane(scene);
   addSphere(scene, 4, 0x7777ff);
   addCube(scene, 4, 0xff0000);
-  addSpotLight(scene, 0xffffff, 1);
+  // addSpotLight(scene, 0xffffff, 1);
+  addAmbientLight(scene, 0xffffff);
 
   update(scene, renderer, camera, controls);
 
@@ -119,6 +120,10 @@ function addSpotLight(scene, color, intensity) {
   light.add(sphere);
   light.castShadow = true;
   light.name = "spotlight";
+  scene.add(light);
+}
+function addAmbientLight(scene, color) {
+  var light = new THREE.AmbientLight(color);
   scene.add(light);
 }
 
