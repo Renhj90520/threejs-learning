@@ -1,7 +1,10 @@
 function init() {
   var scene = new THREE.Scene();
 
-  var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  var renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    alpha: true
+  });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setClearColor(new THREE.Color(0xaaaaff));
   renderer.shadowMap.enabled = true;
@@ -22,7 +25,7 @@ function init() {
   camera.position.z = 45;
   camera.lookAt(new THREE.Vector3(10, 0, 0));
 
-  var uicontrols = new function() {
+  var uicontrols = new function () {
     this.ambientColor = 0x0c0c0c;
   }();
 
@@ -32,8 +35,10 @@ function init() {
   //   var ambientLight = addAmbientLight(scene);
   var axesHelper = new THREE.AxesHelper(20);
   scene.add(axesHelper);
-  //   addSpotLight(scene);
-  addHemisphereLight(scene);
+  addSpotLight(scene);
+  // addHemisphereLight(scene);
+  var ambientLight = new THREE.AmbientLight(0x1c1c1c);
+  scene.add(ambientLight);
   //   addLightSphere(scene);
   //   var pointlight = addPointLight(scene);
   var directionallight = addDirectionalLight(scene, plane);
@@ -72,9 +77,12 @@ function addPlane(scene) {
   scene.add(plane);
   return plane;
 }
+
 function addCube(scene) {
   var cubeGeo = new THREE.BoxGeometry(4, 4, 4);
-  var cubeMat = new THREE.MeshLambertMaterial({ color: 0xff0000 });
+  var cubeMat = new THREE.MeshLambertMaterial({
+    color: 0xff0000
+  });
   var cube = new THREE.Mesh(cubeGeo, cubeMat);
   cube.castShadow = true;
   cube.position.set(10, 2, 5);
@@ -103,6 +111,7 @@ function addPointLight(scene) {
   scene.add(light);
   return light;
 }
+
 function addDirectionalLight(scene, plane) {
   var light = new THREE.DirectionalLight(0xffffff);
   light.position.set(30, 10, -50);
@@ -122,18 +131,23 @@ function addDirectionalLight(scene, plane) {
   scene.add(light);
   return light;
 }
+
 function addLightSphere(scene) {
   var sphereGeo = new THREE.SphereGeometry(0.2);
-  var sphereMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+  var sphereMat = new THREE.MeshLambertMaterial({
+    color: 0xffffff
+  });
   var sphere = new THREE.Mesh(sphereGeo, sphereMat);
   sphere.name = "lightsphere";
   scene.add(sphere);
 }
+
 function addHemisphereLight(scene) {
   var light = new THREE.HemisphereLight(0x0000ff, 0x00ff00, 0.6);
   light.position.set(0, 500, 0);
   scene.add(light);
 }
+
 function addLensFlare(scene, directionalLight) {
   var loader = new THREE.TextureLoader();
   var textureFlare0 = loader.load("/textures/lensflare0.png");
@@ -157,6 +171,7 @@ function addLensFlare(scene, directionalLight) {
 
 var phase = 0;
 var invert = 1;
+
 function update(scene, camera, renderer, controls) {
   controls.update();
   renderer.render(scene, camera);
@@ -179,7 +194,7 @@ function update(scene, camera, renderer, controls) {
   //   pointlight.position.copy(lightsphere.position);
   //   var directionallight = scene.getObjectByName("directionallight");
   //   directionallight.position.copy(lightsphere.position);
-  requestAnimationFrame(function() {
+  requestAnimationFrame(function () {
     update(scene, camera, renderer, controls);
   });
 }
