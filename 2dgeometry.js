@@ -25,8 +25,7 @@ function init() {
     thetastart: 0.3 * Math.PI * 2,
     thetalength: 0.3 * Math.PI * 2,
     segments: 10,
-    redraw: function() {
-      console.log(this);
+    redraw: function () {
       var circle = scene.getObjectByName("circle");
       scene.remove(circle);
       addCircle(
@@ -48,15 +47,70 @@ function init() {
   );
   var circle = addCircle(scene, circleGeo);
 
+  var shapeGeo = new THREE.ShapeGeometry(drawShape());
+  addShape(scene, shapeGeo)
+
   var gui = new dat.GUI();
-  gui.add(circleOptions, "radius", 0, 40).onChange(circleOptions.redraw);
-  gui.add(circleOptions, "segments", 0, 40).onChange(circleOptions.redraw);
-  gui
-    .add(circleOptions, "thetastart", 0, 2 * Math.PI)
-    .onChange(circleOptions.redraw);
-  gui
-    .add(circleOptions, "thetalength", 0, 2 * Math.PI)
-    .onChange(circleOptions.redraw);
+  var circleGUI = gui.addFolder('circle');
+  circleGUI.add(circleOptions, "radius", 0, 40).onChange(function () {
+    circleOptions.redraw();
+  });
+  circleGUI.add(circleOptions, "segments", 0, 40).onChange(function () {
+    circleOptions.redraw();
+  });
+  circleGUI.add(circleOptions, "thetastart", 0, 2 * Math.PI)
+    .onChange(function () {
+      circleOptions.redraw();
+    });
+  circleGUI.add(circleOptions, "thetalength", 0, 2 * Math.PI)
+    .onChange(function () {
+      circleOptions.redraw();
+    });
+
+
+  ringOptions = {
+    innerRadius: 3,
+    outerRadius: 20,
+    thetaSegments: 8,
+    phiSegments: 8,
+    thetaStart: 0,
+    thetaLength: Math.PI * 2,
+    redraw: function () {
+      var ring = scene.getObjectByName('ring');
+      scene.remove(ring);
+      addRing(scene, new THREE.RingGeometry(
+        this.innerRadius,
+        this.outerRadius,
+        this.thetaSegments,
+        this.phiSegments,
+        this.thetaStart,
+        this.thetaLength
+      ));
+    }
+  };
+  var ringGUI = gui.addFolder('ring');
+  ringGUI.add(ringOptions, 'innerRadius', 0, 18).onChange(function () {
+    ringOptions.redraw();
+  });
+  ringGUI.add(ringOptions, 'outerRadius', 20, 30).onChange(function () {
+    ringOptions.redraw();
+  });
+  ringGUI.add(ringOptions, 'thetaSegments', 1, 40).step(1).onChange(function () {
+    ringOptions.redraw();
+  });
+  ringGUI.add(ringOptions, 'phiSegments', 1, 40).step(1).onChange(function () {
+    ringOptions.redraw();
+  });
+  ringGUI.add(ringOptions, 'thetaStart', 0, Math.PI * 2).onChange(function () {
+    ringOptions.redraw();
+  });
+  ringGUI.add(ringOptions, 'thetaLength', 0, Math.PI * 2).onChange(function () {
+    ringOptions.redraw();
+  });
+
+  var ringGeo = new THREE.RingGeometry(ringOptions.innerRadius, ringOptions.outerRadius, ringOptions.thetaSegments, ringOptions.phiSegments, ringOptions.thetaStart, ringOptions.thetaLength);
+  addRing(scene, ringGeo);
+
   var axesHelper = new THREE.AxesHelper(20);
   scene.add(axesHelper);
   var controls = new THREE.OrbitControls(camera);
@@ -94,11 +148,62 @@ function addCircle(scene, geo) {
   return circle;
 }
 
+function drawShape() {
+  var shape = new THREE.Shape();
+  shape.moveTo(10, 10);
+  shape.lineTo(10, 40);
+  shape.bezierCurveTo(15, 25, 25, 25, 30, 40);
+  shape.splineThru([
+    new THREE.Vector2(32, 30),
+    new THREE.Vector2(28, 20),
+    new THREE.Vector2(30, 10)
+  ]);
+
+  shape.quadraticCurveTo(20, 15, 10, 10);
+  var hole1 = new THREE.Path();
+  hole1.absellipse(16, 24, 2, 3, 0, Math.PI * 2, true);
+  shape.holes.push(hole1);
+
+  var hole2 = new THREE.Path();
+  hole2.absellipse(23, 24, 2, 3, 0, Math.PI * 2, true);
+  shape.holes.push(hole2);
+
+  var hole3 = new THREE.Path();
+  hole3.absarc(20, 16, 2, 0, Math.PI, true);
+  shape.holes.push(hole3);
+  return shape;
+}
+
+function addShape(scene, shapeGeo) {
+  var shapeMaterial = new THREE.MeshNormalMaterial();
+  shapeMaterial.side = THREE.DoubleSide;
+  var wireframeMat = new THREE.MeshBasicMaterial();
+  wireframeMat.wireframe = true;
+
+  var shape = THREE.SceneUtils.createMultiMaterialObject(shapeGeo, [shapeMaterial, wireframeMat]);
+  scene.add(shape);
+  return shape;
+}
+
+function addRing(scene, ringGeo) {
+
+  var ringMaterial = new THREE.MeshNormalMaterial();
+  ringMaterial.side = THREE.DoubleSide;
+  var wireframeMat = new THREE.MeshBasicMaterial();
+  wireframeMat.wireframe = true;
+
+  var ring = THREE.SceneUtils.createMultiMaterialObject(ringGeo, [ringMaterial, wireframeMat]);
+  ring.name = 'ring';
+
+  ring.position.x = -40;
+  scene.add(ring);
+}
+
 function update(scene, camera, renderer, controls) {
   controls.update();
   renderer.render(scene, camera);
 
-  requestAnimationFrame(function() {
+  requestAnimationFrame(function () {
     update(scene, camera, renderer, controls);
   });
 }
