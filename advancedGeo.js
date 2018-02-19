@@ -52,7 +52,7 @@ function convexPoints(scene) {
     points.push(new THREE.Vector3(randomX, randomY, randomZ));
   }
 
-  var sphereGroup = new THREE.Object3D();
+  var sphereGroup = new THREE.Group();
   var material = new THREE.MeshBasicMaterial({
     color: 0xff0000
   });
@@ -93,7 +93,7 @@ function lathePoints(scene) {
   var points = [];
   var height = 5;
   var count = 30;
-  var sphereGroup = new THREE.Object3D();
+  var sphereGroup = new THREE.Group();
   for (var i = 0; i < count; i++) {
     points.push(
       new THREE.Vector2(
@@ -137,7 +137,7 @@ function addLatheGeoMesh(scene, points) {
 
 function tubePoints(scene) {
   var points = [];
-  var sphereGroup = new THREE.Object3D();
+  var sphereGroup = new THREE.Group();
   for (let i = 0; i < 8; i++) {
     var randomX = -20 + Math.round(Math.random() * 50);
     var randomY = -15 + Math.round(Math.random() * 40);
