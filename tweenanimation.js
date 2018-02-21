@@ -15,8 +15,24 @@ function init() {
 
   addSpotLight(scene);
   var loader = new THREE.PLYLoader();
-  loader.load("models/test.ply", function(geo) {
-    addPoints(scene, geo);
+  loader.load("models/test.ply", function (geo) {
+    var posSrc = {
+      pos: 1
+    };
+    var tween = new TWEEN.Tween(posSrc).to({
+      pos: 0
+    }, 5000);
+    tween.easing(TWEEN.Easing.Sinusoidal.InOut);
+
+    var tweenback = new TWEEN.Tween(posSrc).to({
+      pos: 1
+    }, 5000);
+    tweenback.easing(TWEEN.Easing.Sinusoidal.InOut);
+
+    tween.chain(tweenback);
+    tweenback.chain(tween);
+
+    addPoints(scene, geo, posSrc, tween, tweenback);
   });
   var controls = new THREE.OrbitControls(camera);
 
@@ -29,7 +45,7 @@ function addSpotLight(scene) {
   scene.add(light);
 }
 
-function addPoints(scene, geo) {
+function addPoints(scene, geo, posSrc, tween, tweenback) {
   var pointsMaterial = new THREE.PointsMaterial({
     color: 0xffffff,
     size: 0.4,
@@ -42,6 +58,14 @@ function addPoints(scene, geo) {
 
   var points = new THREE.Points(geo, pointsMaterial);
   points.sortParticles = true;
+  var originPos = points.position.y;
+  var onUpdate = function () {
+    points.position.y = (originPos + 3.22544) * posSrc.pos - 3.22544;
+  };
+
+  tween.onUpdate(onUpdate);
+  tweenback.onUpdate(onUpdate);
+  tween.start();
 
   scene.add(points);
 }
@@ -75,10 +99,10 @@ function generateSprite() {
 
 function update(scene, camera, renderer, controls) {
   controls.update();
-
+  TWEEN.update();
   renderer.render(scene, camera);
 
-  requestAnimationFrame(function() {
+  requestAnimationFrame(function () {
     update(scene, camera, renderer, controls);
   });
 }
