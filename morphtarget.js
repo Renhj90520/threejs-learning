@@ -71,6 +71,15 @@ function addStaticHorse(scene, geometry) {
   geometry.computeFaceNormals();
   geometry.computeMorphNormals();
 
+  var frameIndex = {
+    index: 0
+  };
+  var tween = new TWEEN.Tween(frameIndex)
+    .to({ index: 15 }, 1000)
+    .onUpdate(function() {
+      console.log(frameIndex);
+    });
+  tween.start();
   showFrame(scene, 0);
 }
 
@@ -104,11 +113,12 @@ function showFrame(scene, index) {
   currentFrame = frames[index];
 }
 function update(scene, camera, renderer) {
+  TWEEN.update();
   var morphAnimMesh = scene.getObjectByName("morphAnimMesh");
   var delta = clock.getDelta();
   if (morphAnimMesh) {
     morphAnimMesh.updateAnimation(delta * 1000);
-    morphAnimMesh.rotation.y += 0.01;
+    // morphAnimMesh.rotation.y += 0.01;
   }
   renderer.render(scene, camera);
   requestAnimationFrame(function() {

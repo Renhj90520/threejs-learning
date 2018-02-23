@@ -21,6 +21,7 @@ function init() {
   var controls = new THREE.OrbitControls(camera);
   update(scene, camera, renderer, controls);
 }
+
 function addSpotLight(scene) {
   var light = new THREE.SpotLight(0xffffff);
   light.position.set(0, 50, 30);
@@ -33,7 +34,7 @@ function addSpotLight(scene) {
 
 function addHand(scene) {
   var jsonLoader = new THREE.JSONLoader();
-  jsonLoader.load("models/hand-1.js", function(geometry, mat) {
+  jsonLoader.load("models/hand-1.js", function (geometry, mat) {
     var material = new THREE.MeshLambertMaterial({
       color: 0xf0c8c9,
       skinning: true
@@ -44,14 +45,41 @@ function addHand(scene) {
     mesh.rotation.z = 0.7 * Math.PI;
     mesh.name = "hand";
     scene.add(mesh);
+
+    function onUpdate(posObj) {
+      var pos = posObj.pos;
+      mesh.skeleton.bones[5].rotation.set(0, 0, pos);
+      mesh.skeleton.bones[6].rotation.set(0, 0, pos);
+      mesh.skeleton.bones[10].rotation.set(0, 0, pos);
+      mesh.skeleton.bones[11].rotation.set(0, 0, pos);
+      mesh.skeleton.bones[15].rotation.set(0, 0, pos);
+      mesh.skeleton.bones[16].rotation.set(0, 0, pos);
+      mesh.skeleton.bones[20].rotation.set(0, 0, pos);
+      mesh.skeleton.bones[21].rotation.set(0, 0, pos);
+      mesh.skeleton.bones[1].rotation.set(pos, 0, 0);
+    }
+    var bonesPos = {
+      pos: -1
+    };
+    var tween = new TWEEN.Tween(bonesPos).to({
+        pos: 0
+      }, 3000)
+      .easing(TWEEN.Easing.Cubic.InOut)
+      .yoyo(true)
+      .repeat(Infinity).onUpdate(function () {
+        onUpdate(bonesPos)
+      });
+
+    tween.start();
+
   });
 }
 
 function update(scene, camera, renderer, controls) {
   controls.update();
   renderer.render(scene, camera);
-
-  requestAnimationFrame(function() {
+  TWEEN.update();
+  requestAnimationFrame(function () {
     update(scene, camera, renderer, controls);
   });
 }
