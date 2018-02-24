@@ -18,11 +18,25 @@ function init() {
   camera.lookAt(new THREE.Vector3(0, 0, 0));
   addAmbientLight(scene);
   addDirectionalLight(scene);
-  var loader = new THREE.DDSLoader();
-  addCube(scene, loader, "textures/seafloor.dds", -12, 0);
-  addSphere(scene, loader, "textures/seafloor.dds", 0, 0);
-  addIcosahedron(scene, loader, "textures/seafloor.dds", 12, 0);
+  var textureLoader = new THREE.TextureLoader();
+  addSphere(scene, textureLoader, "textures/brick-wall.jpg", -12, 12);
+  addSphere(scene, textureLoader, "textures/floor-wood.jpg", 0, 12);
+  addIcosahedron(scene, textureLoader, "textures/metal-rust.jpg", 12, 12);
 
+  var ddsLoader = new THREE.DDSLoader();
+  addSphere(scene, ddsLoader, "textures/seafloor.dds", -12, 0);
+  addSphere(scene, ddsLoader, "textures/seafloor.dds", 0, 0);
+  addIcosahedron(scene, ddsLoader, "textures/seafloor.dds", 12, 0);
+
+  var pvrLoader = new THREE.PVRLoader();
+  addSphere(scene, pvrLoader, "textures/tex_base.pvr", -12, 24);
+  addSphere(scene, pvrLoader, "textures/tex_base.pvr", 0, 24);
+  addIcosahedron(scene, pvrLoader, "textures/tex_base.pvr", 12, 24);
+
+  var tgaLoader = new THREE.TGALoader();
+  addSphere(scene, tgaLoader, "textures/crate_color8.tga", -12, -12);
+  addSphere(scene, tgaLoader, "textures/crate_color8.tga", 0, -12);
+  addIcosahedron(scene, tgaLoader, "textures/crate_color8.tga", 12, -12);
   var controls = new THREE.OrbitControls(camera);
   update(scene, camera, renderer, controls);
 }
@@ -31,11 +45,16 @@ function addAmbientLight(scene) {
   var light = new THREE.AmbientLight(0x141414);
   scene.add(light);
 }
+
 function addDirectionalLight(scene) {
-  var light = new THREE.DirectionalLight();
-  light.position.set(0, 30, 20);
+  // var light = new THREE.DirectionalLight();
+  var light = new THREE.SpotLight();
+  light.position.set(0, 60, 60);
   scene.add(light);
+  var cameraHelper = new THREE.CameraHelper(light.shadow.camera);
+  scene.add(cameraHelper);
 }
+
 function update(scene, camera, renderer, controls) {
   controls.update();
   renderer.render(scene, camera);
@@ -45,13 +64,14 @@ function update(scene, camera, renderer, controls) {
   });
 }
 
-function addCube(scene, loader, url, x, y) {
+function addSphere(scene, loader, url, x, y) {
   var geo = new THREE.BoxGeometry(5, 5, 5);
   var cube = createMesh(geo, loader, url);
   cube.position.x = x;
   cube.position.y = y;
   scene.add(cube);
 }
+
 function addSphere(scene, loader, url, x, y) {
   var geo = new THREE.SphereGeometry(5, 20, 20);
   var sphere = createMesh(geo, loader, url);
@@ -59,6 +79,7 @@ function addSphere(scene, loader, url, x, y) {
   sphere.position.y = y;
   scene.add(sphere);
 }
+
 function addIcosahedron(scene, loader, url, x, y) {
   var geo = new THREE.IcosahedronGeometry(5, 0);
   var icosahedron = createMesh(geo, loader, url);
@@ -66,9 +87,10 @@ function addIcosahedron(scene, loader, url, x, y) {
   icosahedron.position.y = y;
   scene.add(icosahedron);
 }
+
 function createMesh(geo, loader, url) {
   var texture = loader.load(url);
-  var material = new THREE.MeshLambertMaterial();
+  var material = new THREE.MeshPhongMaterial();
   material.map = texture;
 
   var mesh = new THREE.Mesh(geo, material);

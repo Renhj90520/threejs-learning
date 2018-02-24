@@ -108,7 +108,7 @@ function init() {
   gui.add(standardMaterial, "transparent");
   gui.addColor(standardMaterial, "emissive");
   gui.add(standardMaterial, "metalness", 0, 1);
-  addCube(scene, standardMaterial);
+  addSphere(scene, standardMaterial);
 
   var uicontrols = new function() {
     this.cameraNear = camera.near;
@@ -180,7 +180,7 @@ function addSpotLight(scene) {
   scene.add(light);
 }
 
-function addCube(scene, material) {
+function addSphere(scene, material) {
   var cubeGeo = new THREE.BoxGeometry(15, 15, 15);
   var cube = new THREE.Mesh(cubeGeo, material);
   cube.castShadow = true;

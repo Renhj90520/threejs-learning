@@ -54,10 +54,10 @@ function init() {
   //   objMaterial.roughnessMap = loader.load("/textures/scratch.jpg");
   //   objMaterial.bumpMap = loader.load("/textures/scratch.jpg");
   //   objMaterial.bumpScale = 0.01;
-  //   objMaterial.envMap = reflectionCube;
+  objMaterial.envMap = reflectionCube;
 
   //   objMaterial.roughness = 0.5;
-  //   objMaterial.metalness = 0.7;
+  objMaterial.metalness = 0.7;
 
   //   var maps = ["bumpMap", "roughnessMap"];
   //   maps.forEach(function(map) {
@@ -191,8 +191,8 @@ function getGeometry(type, size, material) {
 
 function getMaterial(type, color) {
   var materialOptions = {
-    color: color === undefined ? "rgb(255,255,255)" : color,
-    wireframe: true
+    color: color === undefined ? "rgb(255,255,255)" : color
+    // wireframe: true
   };
 
   switch (type) {
@@ -242,7 +242,7 @@ function update(renderer, scene, camera, clock, controls, stats) {
   }
 
   var geoTypes = GEO_TYPES;
-  var currentIndex = Math.floor(clock.getElapsedTime() / 4 % geoTypes.length);
+  var currentIndex = Math.floor((clock.getElapsedTime() / 4) % geoTypes.length);
 
   geoTypes.forEach(function(geo, index) {
     var currentObj = scene.getObjectByName(geo);
