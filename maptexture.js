@@ -168,12 +168,15 @@ function update(scene, camera, renderer, controls) {
   var spherelight = scene.getObjectByName("spherelight");
   var pointlight = scene.getObjectByName("pointlight");
   if (spherelight) {
-    if (phase <= 0) {
-      invert = 1;
-    } else if (phase >= Math.PI * 2) {
-      invert = -1;
+    // if (phase <= 0) {
+    //   invert = 1;
+    // } else if (phase >= Math.PI * 2) {
+    //   invert = -1;
+    // }
+    phase += 0.03;
+    if (phase >= Math.PI * 2) {
+      phase = 0;
     }
-    phase += 0.03 * invert;
 
     spherelight.position.x = 56 * Math.sin(phase);
     pointlight.position.copy(spherelight.position);
