@@ -117,11 +117,11 @@ function addLeftFlipper(scene) {
       new THREE.MeshPhongMaterial({
         transparent: true,
         opacity: 0.6
-      }),
-      0.3
-    )
+      })
+    ),
+    0.3
   );
-  flipperLeft.position.set(-6, 2, 0);
+  flipperLeft.position.set(-8, 2, 0);
   flipperLeft.castShadow = true;
   scene.add(flipperLeft);
 
@@ -134,7 +134,7 @@ function addLeftFlipper(scene) {
 
   //rotation and axis are relative to the second object
   var constraint = new Physijs.HingeConstraint(flipperLeft, flipperLeftPivot, flipperLeftPivot.position, new THREE.Vector3(0, 1, 0));
-  scene.addConstraint(constraint);
+  scene.addConstraint(constraint, true);
   constraint.setLimits(-2.2, -0.6, 0.1, 0);
 
   constraint.enableAngularMotor(-10, 2); // velocity  acceleration
@@ -165,7 +165,7 @@ function addRightFlipper(scene) {
   scene.add(flipperRightPivot);
 
   var constraint = new Physijs.HingeConstraint(flipperRight, flipperRightPivot, flipperRightPivot.position, new THREE.Vector3(0, 1, 0));
-  scene.addConstraint(constraint);
+  scene.addConstraint(constraint, true);
   constraint.setLimits(-2.2, -0.6, 0.1, 0);
 
   constraint.enableAngularMotor(10, 2);
@@ -228,7 +228,7 @@ function addConeTwist(scene) {
     color: 0x4444ff,
     transparent: true,
     opacity: 0.7
-  })));
+  }), 0, 0), 0);
 
   baseMesh.position.set(20, 15.5, 0);
   baseMesh.castShadow = true;
@@ -239,8 +239,8 @@ function addConeTwist(scene) {
       color: 0x4444ff,
       transparent: true,
       opacity: 0.6
-    })
-  ));
+    }), 0, 0
+  ), 10);
   armMesh.position.set(20, 7.5, 0);
   armMesh.castShadow = true;
   scene.add(armMesh);
