@@ -1,10 +1,11 @@
+var scene;
 var renderer;
 var camera;
 var cube;
 var sphere;
 var cylinder;
 function init() {
-  var scene = new THREE.Scene();
+  scene = new THREE.Scene();
 
   renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -114,7 +115,47 @@ function onDocumentMouseDown(event) {
     }
   }
 }
+function onDocumentMouseMove(event) {
+  var vector = new THREE.Vector3(
+    event.clientX / window.innerWidth * 2 - 1,
+    -event.clientY / window.innerHeight * 2 + 1,
+    0.5
+  );
+  vector.unproject(camera);
+  var dir = vector.sub(camera.position).normalize();
+  var distance = -camera.position.z / dir.z;
+  var pos = camera.position.clone().add(dir.multiplyScalar(distance));
+  var points = [];
+  points.push(
+    new THREE.Vector3(
+      camera.position.x,
+      camera.position.y - 0.2,
+      camera.position.z
+    )
+  );
+  points.push(pos);
+
+  var mat = new THREE.MeshBasicMaterial({
+    color: 0xff0000,
+    transparent: true,
+    opacity: 0.6
+  });
+
+  var tubeGeometry = new THREE.TubeGeometry(
+    new THREE.CatmullRomCurve3(points),
+    60,
+    0.001
+  );
+
+  if (ray) {
+    scene.remove(ray);
+  }
+  ray = new THREE.Mesh(tubeGeometry, mat);
+  scene.add(ray);
+}
+var ray;
 document.addEventListener("mousedown", onDocumentMouseDown, false);
+document.addEventListener("mousemove", onDocumentMouseMove, false);
 var step = 0;
 
 function update(scene, camera, renderer) {
